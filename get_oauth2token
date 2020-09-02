@@ -1,0 +1,88 @@
+#!/bin/sh
+
+# POSIX sh file-based adaptation of oauth2token from
+# https://github.com/tenllado/dotfiles/tree/master/config/msmtp
+
+# Argument: Google account email address
+#
+# using oauth2 script from google-oauth2-tools 
+# (https://github.com/google/gmail-oauth2-tools/blob/master/python/oauth2.py) 
+# to connect to google and obtain the oauth2 token
+#
+# You must perform step 1 from the comments in the oauth2.py script in order to
+# register oauth2.py as an application before using this script. Create a 
+# configuration file that matches the account email address and use the output
+# from oauth2.py to populate it. For example, if the CONFIG_PATH below is set
+# to /etc/oauth2 and your email address is xxx@gmail.com, follow step 1 and
+# create a file /etc/oauth2/xxx@gmail.com with the following key-value pairs
+# populated from the output of step 1:
+# OAUTH_CLIENT_ID=1038[...].apps.googleusercontent.com
+# OAUTH_CLIENT_SECRET=c_5jZcYLW7VDG7MuLB1KSGw4
+# OAUTH_REFRESH_TOKEN=1/Yzm6MRy4q1xi7Dx2DuWXNgT6s37OrP_DW_IoyTum4YA
+# This step only needs to be performed once. New tokens are automatically 
+# requested if the stored tokens have expired.
+
+OAUTH2=/opt/bin/oauth2
+CONFIG_PATH=/opt/etc/oauth2
+
+account=$1
+if [ ! $account ]; then
+	echo "You must specify a Google account email address"
+	exit 1
+fi
+
+if [ -f $CONFIG_PATH/$account ]; then
+	source $CONFIG_PATH/$account
+	if [ $? -ne 0 ]; then
+		echo "The configuration file $CONFIG_PATH/$account could not be loaded."
+		exit 1
+	fi
+else
+	>&2 echo "The configuration file $CONFIG_PATH/$account could not be found."
+	exit 1
+fi
+
+if [ ! $OAUTH_CLIENT_ID ] || [ ! $OAUTH_CLIENT_SECRET ] || [ ! $OAUTH_REFRESH_TOKEN ]; then
+	>&2 echo "The configuration file $CONFIG_PATH/$account must contain at least:"
+	>&2 echo "OAUTH_CLIENT_ID=1038[...].apps.googleusercontent.com"
+	>&2 echo "OAUTH_CLIENT_SECRET=c_5jZcYLW7VDG7MuLB1KSGw4"
+	>&2 echo "OAUTH_REFRESH_TOKEN=1/Yzm6MRy4q1xi7Dx2DuWXNgT6s37OrP_DW_IoyTum4YA"
+	>&2 echo "with the values set according to the output of step 1 in the $OAUTH2 comments."
+fi
+
+store_config() {
+	key=$1
+	val=$(printf '%s\n' "$2" | sed -e 's/[\/&]/\\&/g')
+	if [ "$(tail -c 1 $CONFIG_PATH/$account)" != "" ]; then
+		printf '\n' >> $CONFIG_PATH/$account
+	fi
+	if egrep -q '^'$key'=' $CONFIG_PATH/$account; then
+		sed -i 's/'$key'=.*$/'$key'='$val'/' $CONFIG_PATH/$account
+	else
+		echo "$key=$val" >> $CONFIG_PATH/$account
+	fi
+}
+
+get_access_token() {
+	eval $($OAUTH2 --user=$account \
+	--client_id=$OAUTH_CLIENT_ID \
+	--client_secret=$OAUTH_CLIENT_SECRET \
+	--refresh_token=$OAUTH_REFRESH_TOKEN | \
+	awk '/Access Token:/{print "token="$3}
+	     /Access Token Expiration Seconds:/{print "expire="$5}'
+	)
+}
+
+token="$OAUTH_ACCESS_TOKEN"
+expire="$OAUTH_TOKEN_EXPIRATION"
+now=$(date +%s)
+
+if [ $token ] && [ $expire ] && [ $now -lt $((expire - 60)) ]; then
+	echo $token
+else
+	get_access_token
+	store_config OAUTH_ACCESS_TOKEN "$token"
+	expire=$((now + expire))
+	store_config OAUTH_TOKEN_EXPIRATION "$expire"
+	echo $token
+fi
