@@ -22,8 +22,8 @@
 # This step only needs to be performed once. New tokens are automatically 
 # requested if the stored tokens have expired.
 
-OAUTH2=/opt/bin/oauth2
-CONFIG_PATH=/opt/etc/oauth2
+OAUTH2=/usr/local/bin/oauth2
+CONFIG_PATH=/etc/oauth2
 
 account=$1
 if [ ! $account ]; then
