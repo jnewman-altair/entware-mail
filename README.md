@@ -1,6 +1,6 @@
 # msmtp_oauth2_posix_py3k
 This project was written to re-enable my entware-based mail server to talk to gmail again. Because entware has limited tools available, the excellent oauth2token from https://github.com/tenllado/dotfiles/tree/master/config/msmtp was modified to use a file-based approach with as much portability as possible. (hence POSIX)
-In addition, the Google oauth2 script has not been updated to py3k as far as I can tell, so I did that as well.
+In addition, the Google oauth2 script (https://github.com/google/gmail-oauth2-tools/blob/master/python/oauth2.py) has not been updated to py3k as far as I can tell, so I did that as well.
 
 # Installation and Configuration
 First, copy the files to the system in question, by default this is /usr/local/bin
