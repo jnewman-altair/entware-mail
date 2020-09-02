@@ -11,11 +11,13 @@
 #
 # You must perform step 1 from the comments in the oauth2.py script in order to
 # register oauth2.py as an application before using this script. Create a 
-# configuration file that matches the account email address and use the output
-# from oauth2.py to populate it. For example, if the CONFIG_PATH below is set
-# to /etc/oauth2 and your email address is xxx@gmail.com, follow step 1 and
-# create a file /etc/oauth2/xxx@gmail.com with the following key-value pairs
-# populated from the output of step 1:
+# configuration file that matches the account email address and use the output 
+# from oauth2 to populate it. Be sure to set permissions on this file to 
+# something sane for passwords and token use, such as 600. 
+# For example, if the CONFIG_PATH below is set to /etc/oauth2 and your email 
+# address is xxx@gmail.com, follow step 1 and create a file 
+# /etc/oauth2/xxx@gmail.com with the following key-value pairs populated from 
+# the output of step 1:
 # OAUTH_CLIENT_ID=1038[...].apps.googleusercontent.com
 # OAUTH_CLIENT_SECRET=c_5jZcYLW7VDG7MuLB1KSGw4
 # OAUTH_REFRESH_TOKEN=1/Yzm6MRy4q1xi7Dx2DuWXNgT6s37OrP_DW_IoyTum4YA
