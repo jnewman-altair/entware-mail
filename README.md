@@ -1,5 +1,5 @@
 # msmtp_oauth2_posix_py3k
-This project was written to re-enable my entware-based mail server to talk to gmail again. Because entware has limited tools available, the excellent oauth2token from https://github.com/tenllado/dotfiles/tree/master/config/msmtp was written to use a file-based approach with as much portability as possible. (hence POSIX)
+This project was written to re-enable my entware-based mail server to talk to gmail again. Because entware has limited tools available, the excellent oauth2token from https://github.com/tenllado/dotfiles/tree/master/config/msmtp was modified to use a file-based approach with as much portability as possible. (hence POSIX)
 In addition, the google oauth2 script has not been updated to py3k as far as I can tell, so I did that as well.
 
 # Installation and Configuration
@@ -8,7 +8,7 @@ First, copy the files to the system in question, by default this is /usr/local/b
 Edit the get_oauth2token shell script to match this path and the path to your configuration files
 
 Next, you must perform step 1 from the comments in the oauth2.py script in order to register oauth2 as an application before using the get_oauth2token script. 
-Create a configuration file that matches the account email address and use the output from oauth2 to populate it. 
+Create a configuration file that matches the account email address and use the output from oauth2 to populate it. Be sure to set permissions on this file to something sane for passwords and token use, such as 600. 
 
 For example, if the CONFIG_PATH in the script is set to /etc/oauth2 and your email address is xxx@gmail.com, follow step 1 and
 Create a file /etc/oauth2/xxx@gmail.com with the following key-value pairs populated from the output of step 1:
